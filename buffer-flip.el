@@ -1,4 +1,4 @@
-;;; buffer-flip.el -- Cycle through buffers like ALT-TAB in Windows.
+;;; buffer-flip.el -- Cycle through buffers like Alt-Tab in Windows.
 ;; Copyright (C) 2015 Russell Black
 
 ;; Author: Russell Black (killdash9@github)
@@ -22,7 +22,7 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-;; Lets you flip through buffers like ALT-TAB in Windows.
+;; Lets you flip through buffers like Alt-Tab in Windows.
 
 ;;; Code:
 (require 'key-chord)
@@ -32,24 +32,22 @@
 
 (define-minor-mode buffer-flip-mode
   "A global minor mode that lets you flip through buffers like
-ALT-TAB in Windows, keeping the most recently used buffers on
+Alt-Tab in Windows, keeping the most recently used buffers on
 the top of the stack.  Depends on `key-chord'.
 
 By default, the key chord to begin flipping through buffers is
 \"u8\".  You can customize these keys with the variable
 `buffer-flip-keys'.
 
-\"u\" and \"8\" are roughly analogous to ALT and tab,
+\"u\" and \"8\" are roughly analogous to Alt and Tab,
 respectively.  To begin cycling through the buffers, press u and
 8 at the same time or in rapid succession, `key-chord' style.
 This will flip to the second buffer in the stack returned by
 `buffer-list'.  Repeatedly pressing \"8\" will continue to cycle
 through the buffers.  Pressing * (shift-8) will cycle in the
-opposite direction.  C-g will bring you back to buffer you were
-in before cycling, analagous to ESC when cycling in Windows.
-Once you press any other key, cycling exits.  So, pressing \"u8\"
-repeatedly will toggle between the top two buffers.  Pressing
-\"u88\" will go to the third buffer from the top of the stack."
+opposite direction.  Just begin working in a buffer to stop
+cycling.  C-g cancels cycling and restores the buffer you were in
+before cycling, analagous to Esc when cycling in Windows."
   :global t :keymap buffer-flip-mode-map
   (when buffer-flip-mode
     (unless key-chord-mode
@@ -70,9 +68,10 @@ key bindings in `buffer-flip-mode-map'."
 
 (defcustom buffer-flip-keys "u8*"
   "Keys for flipping through buffers.
-The first character functions as the ALT in ALT-TAB, and the
-second character functions as the TAB.  The third character
-functions as SHIFT-TAB.  This would typically be the shifted
+The first two characters form the key-chord that begins buffer
+cycling.  The second character pressed on its own continues
+cycling in the forward direction.  The third character cycles in
+the backward direction.  This would typically be the shifted
 version of the second character.  These may not be modifier keys,
 and because of a restriction in key-chord, these must be
 characters between 32 and 126.  Choose a key combination not
@@ -85,8 +84,8 @@ See `buffer-flip-mode' for more information."
   (interactive)
   (lexical-let*
       ((buffer-list (buffer-list))
-       (index 0)
-       (cycle
+       (index 0)                  ; The current index into buffer-list
+       (cycle ; a function which will be invoked by the transient map below
         (lambda () (interactive)
           ;; switch to the next non-minibuffer buffer that is not in
           ;; another window
@@ -98,12 +97,15 @@ See `buffer-flip-mode' for more information."
                 do (setq buf (nth index buffer-list))
                 while (or (get-buffer-window buf) (minibufferp buf))
                 finally (switch-to-buffer buf t)))))
-    (funcall cycle)
-    (set-transient-map
+    (funcall cycle) ; first buffer flip
+    (set-transient-map                 ; read flip key or exit cycling
      `(keymap (,(elt buffer-flip-keys 1) . ,cycle)  ; cycle forward
               (,(elt buffer-flip-keys 2) . ,cycle)) ; cycle backward
-     t (lambda () (switch-to-buffer (if (cl-find 7 (this-command-keys)) ; C-g resets
-                                   (car buffer-list) (current-buffer)))))))
+     t (lambda () (switch-to-buffer (if (cl-find 7 (this-command-keys)) 
+                                   (car buffer-list) ; C-g restores original buffer
+                                        ; Any other key places current buffer
+                                        ; on top of stack
+                                 (current-buffer))))))) 
 
 (provide 'buffer-flip)
 ;;; buffer-flip.el ends here
