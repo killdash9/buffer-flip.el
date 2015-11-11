@@ -33,7 +33,7 @@
 (define-minor-mode buffer-flip-mode
   "A global minor mode that lets you flip through buffers like
 Alt-Tab in Windows, keeping the most recently used buffers on
-the top of the stack.  Depends on `key-chord'.
+the top of the stack.  Depends on `key-chord-mode'.
 
 By default, the key chord to begin flipping through buffers is
 \"u8\".  You can customize these keys with the variable
@@ -60,7 +60,7 @@ Called from variable customization.  SYMBOL is
 `buffer-flip-keys', and the keys in VALUE are used to register
 key bindings in `buffer-flip-mode-map'."
   (when (not (and (= 3 (length value)) (or (stringp value))))
-    (user-error "This must be a three character string"))
+    (user-error "buffer-flip-keys must be a three character string"))
   (set-default symbol value)
   ;; empty the mode map to clear out previous bindings
   (setcdr buffer-flip-mode-map nil)
