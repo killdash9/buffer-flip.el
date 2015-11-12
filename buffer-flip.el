@@ -30,6 +30,7 @@
 (defvar buffer-flip-mode-map '(keymap)
   "The mode map for `buffer-flip-mode'.")
 
+;;;###autoload
 (define-minor-mode buffer-flip-mode
   "A global minor mode that lets you flip through buffers like
 Alt-Tab in Windows, keeping the most recently used buffers on
