@@ -1,4 +1,4 @@
-;;; buffer-flip.el -- Cycle through buffers like Alt-Tab in Windows.
+;;; buffer-flip.el --- Use key-chord to cycle through buffers like Alt-Tab in Windows
 ;; Copyright (C) 2015 Russell Black
 
 ;; Author: Russell Black (killdash9@github)
