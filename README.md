@@ -61,5 +61,4 @@ second buffer in the stack returned by `(buffer-list)`.  Repeatedly
 pressing `8` will continue to cycle through the buffers.  Pressing `*`
 (`shift-8`) will cycle in the opposite direction.  Just begin working
 in a buffer to stop cycling.  `C-g` cancels cycling and restores the
-buffer you were in before cycling began, analagous to `Esc` when
-cycling in Windows.
+buffer you were in before, analagous to `Esc` when cycling in Windows.

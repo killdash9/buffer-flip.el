@@ -50,7 +50,7 @@ This will flip to the second buffer in the stack returned by
 through the buffers.  Pressing * (shift-8) will cycle in the
 opposite direction.  Just begin working in a buffer to stop
 cycling.  C-g cancels cycling and restores the buffer you were in
-before cycling, analagous to Esc when cycling in Windows."
+before, analagous to Esc when cycling in Windows."
   :global t :keymap buffer-flip-mode-map
   (when buffer-flip-mode
     (unless key-chord-mode
