@@ -1,9 +1,10 @@
 buffer-flip.el
 =================
 
-Provides a global minor mode that lets you flip through buffers like
-Alt-Tab in Windows, keeping the most recently used buffers on the top
-of the stack.  Depends on
+This package streamlines the operation of switching between recent
+buffers, with an emphasis on minimizing keystrokes.  Inspired by the
+Alt-Tab convention in Windows, it keeps the most recently used buffers
+on the top of the stack.  Depends on
 [`key-chord`](https://melpa.org/#/key-chord).
 
 Installation
