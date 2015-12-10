@@ -9,6 +9,8 @@ of the stack.  Depends on
 Installation
 ------------
 
+[![MELPA](https://melpa.org/packages/buffer-flip-badge.svg)](https://melpa.org/#/buffer-flip)
+
 To install from melpa,
 
     M-x package-install RET buffer-flip
@@ -67,7 +69,7 @@ To customize the keys, use
 
     M-x customize-variable RET buffer-flip-keys
 
-or place this in your configuration.
+or place this in your configuration:
 
     (buffer-flip-set-keys 'buffer-flip-keys "u8*")
 
