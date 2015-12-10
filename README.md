@@ -52,7 +52,7 @@ Key Bindings
 -------------
 
 By default, the key chord to begin flipping through buffers is `u8`.
-You can customize these keys with the variable `buffer-flip-keys`.
+You can customize this.
 
 `u` and `8` are roughly analogous to `Alt` and `Tab`, respectively.
 To begin cycling through the buffers, press `u` and `8` at the same
@@ -62,3 +62,21 @@ pressing `8` will continue to cycle through the buffers.  Pressing `*`
 (`shift-8`) will cycle in the opposite direction.  Just begin working
 in a buffer to stop cycling.  `C-g` cancels cycling and restores the
 buffer you were in before, analagous to `Esc` when cycling in Windows.
+
+To customize the keys, use
+
+    M-x customize-variable RET buffer-flip-keys
+
+or place this in your configuration.
+
+    (buffer-flip-set-keys 'buffer-flip-keys "u8*")
+
+The first two characters form the key-chord that begins buffer
+cycling.  They are automatically registered with `key-chord` when set
+using one of the above methods.  The second character pressed on its
+own continues cycling in the forward direction.  The third character
+cycles in the backward direction.  This would typically be the shifted
+version of the second character.  These may not be modifier keys, and
+because of a restriction in key-chord, they must be characters between
+32 and 126.  Choose a key combination not likely to be used in
+succession in normal editing.
