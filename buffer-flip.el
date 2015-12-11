@@ -25,8 +25,7 @@
 ;; Lets you flip through buffers like Alt-Tab in Windows.
 
 ;;; Code:
-(eval-when-compile
-  (require 'cl))
+(eval-when-compile (require 'cl))
 (require 'key-chord)
 
 (defvar buffer-flip-mode-map '(keymap)
@@ -58,13 +57,14 @@ before, analagous to Esc when cycling in Windows."
         (key-chord-mode 1)))))
 
 (defun buffer-flip-set-keys (symbol value)
-  "Set keys used by buffer-flip.
-Called from variable customization.  SYMBOL is
-`buffer-flip-keys', and the keys in VALUE are used to register
-key bindings in `buffer-flip-mode-map'."
-  (when (not (and (= 3 (length value)) (or (stringp value))))
+  "Set the variable `buffer-flip-keys'.
+Called from variable customization.  SYMBOL is ignored, and VALUE
+is a three-character string.  This function registers the first
+two characters in VALUE as a key-chord for `buffer-flip'.  See
+`buffer-flip-keys' for a full description of the VALUE string."
+  (when (not (and (stringp value) (= 3 (length value))))
     (user-error "buffer-flip-keys must be a three character string"))
-  (set-default symbol value)
+  (set-default 'buffer-flip-keys value)
   ;; empty the mode map to clear out previous bindings
   (setcdr buffer-flip-mode-map nil)
   (key-chord-define buffer-flip-mode-map (substring value 0 2) 'buffer-flip))
@@ -76,39 +76,27 @@ cycling.  The second character pressed on its own continues
 cycling in the forward direction.  The third character cycles in
 the backward direction.  This would typically be the shifted
 version of the second character.  These may not be modifier keys,
-and because of a restriction in key-chord, these must be
+and because of a restriction in key-chord, they must be
 characters between 32 and 126.  Choose a key combination not
 likely to be used in succession in normal editing."
   :set 'buffer-flip-set-keys :type '(string) :group 'buffer-flip)
 
 (defun buffer-flip ()
-  "Begins the process of flipping through buffers.
+  "Flip to the next buffer in the stack.
 See `buffer-flip-mode' for more information."
-  (interactive)
-  (lexical-let*
-      ((buffer-list (buffer-list))
-       (index 0)                  ; The current index into buffer-list
-       (cycle ; a function which will be invoked by the transient map below
-        (lambda () (interactive)
-          ;; switch to the next non-minibuffer buffer that is not in
-          ;; another window
-          (loop with buf
-                do (setq index
-                         (mod (+ index (if (cl-find (elt buffer-flip-keys 2)
-                                                    (this-command-keys)) -1 1))
-                              (length buffer-list)))
-                do (setq buf (nth index buffer-list))
-                while (or (get-buffer-window buf) (minibufferp buf))
-                finally (switch-to-buffer buf t)))))
-    (funcall cycle) ; first buffer flip
-    (set-transient-map                 ; read flip key or exit cycling
-     `(keymap (,(elt buffer-flip-keys 1) . ,cycle)  ; cycle forward
-              (,(elt buffer-flip-keys 2) . ,cycle)) ; cycle backward
-     t (lambda () (switch-to-buffer (if (cl-find 7 (this-command-keys)) 
-                                   (car buffer-list) ; C-g restores original buffer
-                                        ; Any other key places current buffer
-                                        ; on top of stack
-                                 (current-buffer))))))) 
+  (interactive)     
+  (switch-to-buffer              ; Switch to next/prev buffer in stack
+   (do ((buf (current-buffer)    ; Starting with the current buffer
+             (nth (mod (+ (cl-position buf (buffer-list)) ; Advance buf position
+                          (if (cl-find (elt buffer-flip-keys 2) ; Back key?
+                                       (this-command-keys)) -1 1)) ; Fwd or back
+                       (length (buffer-list))) (buffer-list)))) ; Mod to wrap
+       ((not (or (get-buffer-window buf) (minibufferp buf))) buf)) t) ; not mini
+  (set-transient-map                                   ; Read next key
+   `(keymap (,(elt buffer-flip-keys 1) . buffer-flip)  ; Flip forward
+            (,(elt buffer-flip-keys 2) . buffer-flip)) ; Flip backward
+   t (lambda () (switch-to-buffer (if (cl-find 7 (this-command-keys)) ; Cancel flip?
+                                 (car (buffer-list)) (current-buffer))))))
 
 (provide 'buffer-flip)
 ;;; buffer-flip.el ends here
