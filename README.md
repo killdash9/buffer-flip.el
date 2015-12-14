@@ -32,9 +32,16 @@ time or in rapid succession, `key-chord` style.  This will flip to the
 second buffer in the stack returned by `(buffer-list)`.  Repeatedly
 pressing `8` will continue to cycle through the buffers.  Pressing `*`
 (`shift-8`) will cycle in the opposite direction.  Just begin working
-in the current buffer to stop cycling.  `C-g` cancels cycling and
-restores the buffer you were in before, analagous to `Esc` when
-cycling in Windows.
+in the current buffer to stop cycling.  Doing so places the current
+buffer on top of the stack.  `C-g` cancels cycling and restores the
+buffer you were in before, analagous to `Esc` when cycling in Windows.
+
+| Pressing   | Does this                                                                                       |
+|------------|-------------------------------------------------------------------------------------------------|
+| u8         | Alternates between the two most recent buffers                                                  |
+| u8 8       | Flip to third most recent buffer                                                                |
+| u8 8 8 C-g | Start flipping through buffers and then cancel, returning to the original buffer.               |
+| u8 8 * *   | Flips through the two most recent buffers, then flips backward and ends on the original buffer. |
 
 To customize the keys, use
 

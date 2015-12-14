@@ -22,7 +22,7 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-;; Lets you flip through buffers like Alt-Tab in Windows.
+;; Inspired by Alt-Tab.  Quickly flip through recently-used buffers. 
 
 ;;; Code:
 (eval-when-compile (require 'cl))
