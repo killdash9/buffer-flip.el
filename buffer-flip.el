@@ -5,7 +5,7 @@
 ;; Keywords: convenience
 ;; URL: https://github.com/killdash9/buffer-flip.el
 ;; Created: 10th November 2015
-;; Version: 20151110
+;; Version: 1.0
 ;; Package-Requires: ((key-chord "20150808"))
 
 ;; This program is free software; you can redistribute it and/or modify
