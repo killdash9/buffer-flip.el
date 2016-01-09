@@ -18,30 +18,34 @@ To install from melpa,
 
 Then add this to your config:
 
+    (key-chord-mode 1) ;; if you're not already enabling key-chord-mode
     (buffer-flip-mode)
 
 Key Bindings
 -------------
 
-By default, the key chord to begin flipping through buffers is `u8`.
-You can customize this.
+By default, the key chord to begin flipping through buffers is
+<kbd>u8</kbd>.  You can customize this.
 
-`u` and `8` are roughly analogous to `Alt` and `Tab`, respectively.
-To begin cycling through the buffers, press `u` and `8` at the same
-time or in rapid succession, `key-chord` style.  This will flip to the
-second buffer in the stack returned by `(buffer-list)`.  Repeatedly
-pressing `8` will continue to cycle through the buffers.  Pressing `*`
-(`shift-8`) will cycle in the opposite direction.  Just begin working
-in the current buffer to stop cycling.  Doing so places the current
-buffer on top of the stack.  `C-g` cancels cycling and restores the
-buffer you were in before, analagous to `Esc` when cycling in Windows.
+<kbd>u</kbd> and <kbd>8</kbd> are roughly analogous to <kbd>Alt</kbd>
+and <kbd>Tab</kbd>, respectively.  To begin cycling through the
+buffers, press <kbd>u</kbd> and <kbd>8</kbd> at the same time or in
+rapid succession, `key-chord` style.  This begins the flipping process
+by switching to the most recently used buffer.  At this point,
+pressing <kbd>8</kbd> by itself will continue to cycle through the
+buffer stack, more recent buffers first.  Pressing <kbd>*</kbd>
+(`shift-8` on an English keyboard) will cycle in the opposite
+direction.  Just begin working in the current buffer to stop cycling.
+Doing so places the current buffer on top of the stack.
+<kbd>C-g</kbd> cancels cycling and restores the buffer you were in
+before, analagous to <kbd>Esc</kbd> when cycling in Windows.
 
-| Pressing   | Does this                                                                                       |
-|------------|-------------------------------------------------------------------------------------------------|
-| u8         | Alternates between the two most recent buffers                                                  |
-| u8 8       | Flip to third most recent buffer                                                                |
-| u8 8 8 C-g | Start flipping through buffers and then cancel, returning to the original buffer.               |
-| u8 8 * *   | Flips through the two most recent buffers, then flips backward and ends on the original buffer. |
+| Pressing                                               | Does this                                                                         |
+|--------------------------------------------------------|-----------------------------------------------------------------------------------|
+| <kbd>u8</kbd>                                          | Alternates between the two most recent buffers                                    |
+| <kbd>u8</kbd> <kbd>8</kbd>                             | Flip to third most recent buffer                                                  |
+| <kbd>u8</kbd> <kbd>8</kbd> <kbd>8</kbd> <kbd>C-g</kbd> | Start flipping through buffers and then cancel, returning to the original buffer. |
+| <kbd>u8</kbd> <kbd>8</kbd> <kbd>*</kbd>                | Flips forward through the two most recent buffers, then flips backward one buffer.              |
 
 To customize the keys, use
 
@@ -69,7 +73,7 @@ operation of switching between the most recent buffers, a common
 operation in my workflow.  Many buffer management systems display a
 list of buffer names for you to select from.  Extra ui elements like
 that often come at the cost of additional keystrokes.  This package
-doesn't display a list of buffers, it simply switches the current
+doesn't display a list of buffers, it simply changes the current
 buffer as you cycle.  Once you are looking at the buffer you want,
 just start working and the cycling automatically exits.  Pressing C-g
 during cycling will take you back to where you started.
