@@ -22,7 +22,7 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-;; Inspired by Alt-Tab.  Quickly flip through recently-used buffers. 
+;; Inspired by Alt-Tab.  Quickly flip through recently-used buffers.
 
 ;;; Code:
 (eval-when-compile (require 'cl))
@@ -78,8 +78,8 @@ two characters in VALUE as a key-chord for `buffer-flip'.  See
   "Keys for flipping through buffers.
 The first two characters form the key-chord that begins buffer
 cycling.  They are automatically registered with `key-chord` when
-set this variable is customized.  The second character pressed on
-its own continues cycling in the forward direction.  The third
+this variable is customized.  The second character pressed on its
+own continues cycling in the forward direction.  The third
 character cycles in the backward direction.  This would typically
 be the shifted version of the second character.  These may not be
 modifier keys, and because of a restriction in key-chord, they
