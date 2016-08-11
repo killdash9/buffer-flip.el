@@ -98,7 +98,8 @@ See `buffer-flip-mode' for more information."
                           (if (cl-find (elt buffer-flip-keys 2) ; Back key?
                                        (this-command-keys)) -1 1)) ; Fwd or back
                        (length (buffer-list))) (buffer-list)))) ; Mod to wrap
-       ((not (or (get-buffer-window buf) (minibufferp buf))) buf)) t) ; not mini
+       ((not (or (get-buffer-window buf) ; not already visible 
+                 (equal ? (elt (buffer-name buf) 0)))) buf)) t) ; not internal
   (set-transient-map                                   ; Read next key
    `(keymap (,(elt buffer-flip-keys 1) . buffer-flip)  ; Flip forward
             (,(elt buffer-flip-keys 2) . buffer-flip)) ; Flip backward
