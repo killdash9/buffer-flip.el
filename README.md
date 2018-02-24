@@ -15,7 +15,7 @@ buffer-flip is available on Melpa.
 
 ### Installing with package-install
 
-M-x package-install RET buffer-flip RET
+    M-x package-install RET buffer-flip RET
 
 Then add the following to your config, adapting to your preferences.
 
@@ -92,8 +92,28 @@ I like it because I can reach the keys easily in home position.
                ( "C-g" . buffer-flip-abort)))
 ```
 
+With these bindings,
+
+| Pressing                                               | Does this                                                                         |
+|--------------------------------------------------------|-----------------------------------------------------------------------------------|
+| <kbd>u8</kbd>                                          | Alternates between the two most recent buffers                                    |
+| <kbd>u8</kbd> <kbd>8</kbd>                             | Flip to third most recent buffer                                                  |
+| <kbd>u8</kbd> <kbd>8</kbd> <kbd>8</kbd> <kbd>C-g</kbd> | Start flipping through buffers and then cancel, returning to the original buffer. |
+| <kbd>u8</kbd> <kbd>8</kbd> <kbd>*</kbd>                | Flips forward through the two most recent buffers, then flips backward one buffer.|
+
 This is incidentally the default key binding for previous versions of
 this package.  The current version has no default key binding.
+
+There is a functional difference between this binding and the Alt-Tab
+version above, which is that pressing the <kbd>u8</kbd> chord
+repeatedly will alternate between the two most recent buffers because
+it restarts the cycling process each time by invoking the
+`buffer-flip` command.  In contrast, pressing <kbd>Alt-Tab</kbd>
+repeatedly cycles through deeper and deeper buffers on the stack.
+This is because <kbd>Alt-Tab</kbd> is bound to both `buffer-flip` and
+`buffer-flip-forward`.  The first press puts you into cycling mode,
+and subsequent presses cycle forward.
+
 
 buffer-flip-other-window 
 ------------------------
