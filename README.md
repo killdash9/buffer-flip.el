@@ -4,79 +4,122 @@ buffer-flip.el
 This package streamlines the operation of switching between recent
 buffers, with an emphasis on minimizing keystrokes.  Inspired by the
 Alt-Tab convention in Windows, it keeps the most recently used buffers
-on the top of the stack.  Depends on
-[`key-chord`](https://melpa.org/#/key-chord).
+on the top of the stack.
 
 Installation
 ------------
 
+buffer-flip is available on Melpa.
+
 [![MELPA](https://melpa.org/packages/buffer-flip-badge.svg)](https://melpa.org/#/buffer-flip)
 
-To install from melpa,
+### Installing with package-install
 
-    M-x package-install RET buffer-flip RET
+M-x package-install RET buffer-flip RET
 
-Then add this to your config:
+Then add the following to your config, adapting to your preferences.
 
-    (key-chord-mode 1) ;; if you're not already enabling key-chord-mode
-    (buffer-flip-mode)
+```lisp
+;; key to begin cycling buffers.  Global key.
+(global-set-key (kbd "M-<tab>") 'buffer-flip)
+    
+;; transient keymap used once cycling starts
+(setq buffer-flip-map
+      (let ((map (make-sparse-keymap)))
+        (define-key map (kbd "M-<tab>")   'buffer-flip-forward) 
+        (define-key map (kbd "M-S-<tab>") 'buffer-flip-backward)
+        (define-key map (kbd "M-ESC")     'buffer-flip-abort)
+        map))
 
-Key Bindings
+;; buffers matching these patterns will be skipped
+(setq buffer-flip-skip-patterns 
+      '("^\\*helm\\b"
+        "^\\*swiper\\*$"))
+```
+
+### Installing with [use-package](https://github.com/jwiegley/use-package)
+
+```lisp
+(use-package buffer-flip
+  :ensure t
+  :bind  (("M-<tab>" . buffer-flip)
+          :map buffer-flip-map
+          ( "M-<tab>" .   buffer-flip-forward) 
+          ( "M-S-<tab>" . buffer-flip-backward) 
+          ( "M-ESC" .     buffer-flip-abort))
+  :config
+  (setq buffer-flip-skip-patterns
+        '("^\\*helm\\b"
+          "^\\*swiper\\*$")))
+```
+
+Usage example
 -------------
 
-By default, the key chord to begin flipping through buffers is
-<kbd>u8</kbd>.  You can customize this.
+The following assumes the above key bindings. 
 
-<kbd>u</kbd> and <kbd>8</kbd> are roughly analogous to <kbd>Alt</kbd>
-and <kbd>Tab</kbd>, respectively.  To begin cycling through the
-buffers, press <kbd>u</kbd> and <kbd>8</kbd> at the same time or in
-rapid succession, `key-chord` style.  This begins the flipping process
-by switching to the most recently used buffer.  At this point,
-pressing <kbd>8</kbd> by itself will continue to cycle through the
-buffer stack, more recent buffers first.  Pressing <kbd>*</kbd>
-(`shift-8` on an English keyboard) will cycle in the opposite
-direction.  Just begin working in the current buffer to stop cycling.
-Doing so places the current buffer on top of the stack.
-<kbd>C-g</kbd> cancels cycling and restores the buffer you were in
-before, analagous to <kbd>Esc</kbd> when cycling in Windows.
+To begin cycling through the buffers, press <kbd>Alt-Tab</kbd>.  This
+begins the flipping process by switching to the most recently used
+buffer.  At this point the transient buffer-flip-map is active.
+Pressing <kbd>Alt-Tab</kbd> will continue to cycle through the buffer
+stack, more recent buffers first.  Pressing <kbd>Alt-Shift-Tab</kbd>
+will cycle in the opposite direction.  Just begin working in the
+currently-displayed buffer to stop cycling.  Doing so places that
+buffer on top of the stack.  <kbd>Alt-Esc</kbd> cancels cycling and
+switches to the buffer you started in.
 
-| Pressing                                               | Does this                                                                         |
-|--------------------------------------------------------|-----------------------------------------------------------------------------------|
-| <kbd>u8</kbd>                                          | Alternates between the two most recent buffers                                    |
-| <kbd>u8</kbd> <kbd>8</kbd>                             | Flip to third most recent buffer                                                  |
-| <kbd>u8</kbd> <kbd>8</kbd> <kbd>8</kbd> <kbd>C-g</kbd> | Start flipping through buffers and then cancel, returning to the original buffer. |
-| <kbd>u8</kbd> <kbd>8</kbd> <kbd>*</kbd>                | Flips forward through the two most recent buffers, then flips backward one buffer.              |
+| Pressing                                                                    | Does this                                                                         |
+|-----------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| <kbd>Alt-Tab</kbd>                                                          | Flips to second most recent buffer                                                |
+| <kbd>Alt-Tab</kbd> <kbd>Alt-Tab</kbd>                                       | Flip to third most recent buffer                                                  |
+| <kbd>Alt-Tab</kbd> <kbd>Alt-Tab</kbd> <kbd>Alt-Tab</kbd> <kbd>Alt-Esc</kbd> | Start flipping through buffers and then cancel, returning to the original buffer. |
+| <kbd>Alt-Tab</kbd> <kbd>Alt-Tab</kbd> <kbd>Alt-Shift-Tab</kbd>              | Flips forward through the two most recent buffers, then flips backward one buffer.|
 
-To customize the keys, use
 
-    M-x customize-variable RET buffer-flip-keys RET
+Another good key binding
+------------------------
 
-or place this in your configuration:
+Personally I use the following key bindings which rely on key-chord.
+I like it because I can reach the keys easily in home position.
 
-    (buffer-flip-set-keys 'buffer-flip-keys "u8*")
+```lisp
+(use-package buffer-flip
+  :ensure t
+  :chords (("u8" . buffer-flip))
+  :bind  (:map buffer-flip-map
+               ( "8" .   buffer-flip-forward) 
+               ( "*" .   buffer-flip-backward) 
+               ( "C-g" . buffer-flip-abort)))
+```
 
-The first two characters form the key-chord that begins buffer
-cycling.  They are automatically registered with `key-chord` when set
-using one of the above methods.  The second character pressed on its
-own continues cycling in the forward direction.  The third character
-cycles in the backward direction.  This would typically be the shifted
-version of the second character.  These may not be modifier keys, and
-because of a restriction in key-chord, they must be characters between
-32 and 126.  Choose a key combination not likely to be used in
-succession in normal editing.
+This is incidentally the default key binding for previous versions of
+this package.  The current version has no default key binding.
+
+buffer-flip-other-window 
+------------------------
+
+A common operation in my work flow is to switch to the other window
+buffer before flipping buffers.  That is, I want to keep my current
+buffer on top, but I want to get to some buried buffer on the other
+window.  `buffer-flip-other-window` does just that.  If there is only
+one window, the function will split the window automatically.  It's a
+little like `pop-to-buffer` for buffer-flipping.  It can be bound to
+its own keystroke, or can be invoked by calling `buffer-flip` with a
+prefix arg.
 
 The (Non) UI
 -------------
 
 Or, "Why don't you have a screenshot?"  This package streamlines the
-operation of switching between the most recent buffers, a common
-operation in my workflow.  Many buffer management systems display a
-list of buffer names for you to select from.  Extra ui elements like
-that often come at the cost of additional keystrokes.  This package
-doesn't display a list of buffers, it simply changes the current
-buffer as you cycle.  Once you are looking at the buffer you want,
-just start working and the cycling automatically exits.  Pressing C-g
-during cycling will take you back to where you started.
+operation of switching to recent buffers, a common operation in my
+workflow.  Many buffer management systems display a list of buffer
+names for you to select from.  Extra ui elements like that often come
+at the cost of additional keystrokes.  This package doesn't have any
+ui elements, it simply changes the current buffer as you cycle.  Once
+you are looking at the buffer you want, just start editing and the
+cycling automatically exits.  Pressing the key bound to
+`buffer-flip-abort` during cycling will take you back to where you
+started.
 
 This package is not efficient for switching to a deeply-buried buffer.
 There are
@@ -90,8 +133,15 @@ Motivation
 The [Alt-Tab](https://en.wikipedia.org/wiki/Alt-Tab) convention for
 switching windows was one thing Microsoft got right.  Because it keeps
 the most recently-used things on the top of the stack, it is often
-very fast to switch to the thing you want.  There are
-[similar Emacs packages](http://www.emacswiki.org/emacs/ControlTABbufferCycling)
-out there, but many are too heavyweight for my needs, involve new UI
-elements, or are not stack-based.  `buffer-flip` is very simple and
-lightweight -- less than 40 lines of actual code.
+very fast to switch to the thing you want.  There are [similar Emacs
+packages](http://www.emacswiki.org/emacs/ControlTABbufferCycling) out
+there, but many are too heavyweight for my needs, or are not
+stack-based.
+
+A note on the buffer stack
+--------------------------
+
+There is no additional buffer stack maintained by this package.  Emacs
+already keeps its buffers in a stack, and this package leverages that
+fact.  You can see the Emacs buffer stack by running `M-x
+list-buffers` or by evaluating `(buffer-list)`.
