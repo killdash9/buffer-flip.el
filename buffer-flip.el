@@ -73,6 +73,10 @@ ORIGINAL-CONFIGURATION is used internally by
 be restored upon abort."
   (interactive "P")
   (buffer-flip-check-map-configuration)
+  ;; ensure current buffer is on the top of the stack at outset.  It's
+  ;; rare, but this happens sometimes, particularly with the help
+  ;; buffer.
+  (switch-to-buffer (current-buffer))
   (if arg
       (buffer-flip-other-window)    ; C-u calls buffer-flip-other-window
     (setq buffer-flip-original-window-configuration ;restored in abort
