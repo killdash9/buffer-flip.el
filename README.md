@@ -120,7 +120,7 @@ buffer-flip-other-window
 
 A common operation in my work flow is to switch to the other window
 buffer before flipping buffers.  That is, I want to keep my current
-buffer on top, but I want to get to some buried buffer on the other
+buffer on top, but I want to get to some buried buffer in the other
 window.  `buffer-flip-other-window` does just that.  If there is only
 one window, the function will split the window automatically.  It's a
 little like `pop-to-buffer` for buffer-flipping.  It can be bound to
