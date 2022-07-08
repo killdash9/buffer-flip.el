@@ -4,7 +4,7 @@
 ;; Keywords: convenience
 ;; URL: https://github.com/killdash9/buffer-flip.el
 ;; Created: 10th November 2015
-;; Version: 2.0
+;; Version: 3.0
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -105,8 +105,10 @@ DIRECTION can be 'forward or 'backward"
      (do ((buf (current-buffer)  ; Using the current buffer as a
                (nth (mod (+ (cl-position buf l) ; reference point to cycle
                             (if (eq direction 'backward) -1 1)) ; fwd or back
-                         (length l)) l)))                ; Mod length to wrap
-         ((not (buffer-flip-skip-buffer buf)) buf)) t))) ; skipping some buffers
+                         (length l)) l)) ; Mod length to wrap
+          (count (length l) (1- count))) ; count the number of iterations
+         ((or (= 0 count) ;; don't cycle through list more than once.
+              (not (buffer-flip-skip-buffer buf))) buf)) t))) ; skip some buffers
 
 (defun buffer-flip-skip-buffer (buf)
   "Return non-nil if BUF should be skipped."
@@ -137,81 +139,6 @@ This command should be bound to a key inside of
   (interactive)
   (set-window-configuration buffer-flip-original-window-configuration)
   (funcall buffer-flip-exit-function))
-
-;;; Backwards compatibility and migration instructions for users on
-;;; old version
-
-(defun buffer-flip-set-keys (symbol value)
-  "Depcrecated.  Kept for backward compatibility.
-Prints upgrade instructions if it is called.
-Called from variable customization.  Sets the value of
-`buffer-flip-keys' to VALUE.  SYMBOL is ignored."
-  (set-default 'buffer-flip-keys value)
-  (when (not (string-equal value "u8*"))
-    (buffer-flip-upgrade-instructions)))
-
-(defcustom buffer-flip-keys "u8*"
-  "Deprecated.  Kept for backward compatibility.
-See online documentation for new way to configure."
-  :set 'buffer-flip-set-keys :type '(string) :group 'buffer-flip)
-
-(defun buffer-flip-mode (&rest args)
-  "Deprecated.  Kept for backward compatibility.
-ARGS is ignored."
-  (interactive)
-  (buffer-flip-upgrade-instructions))
-
-(defun buffer-flip-upgrade-instructions ()
-  "Print upgrade instructions, and migrate old configuration."
-  (when (not (and (stringp buffer-flip-keys) (= 3 (length buffer-flip-keys))))
-    (setq buffer-flip-keys "u8*"))
-  
-  (let* ((new-config
-          `((key-chord-define-global ,(substring buffer-flip-keys 0 2)
-                                     'buffer-flip)
-            (setq buffer-flip-map
-                  (let ((map (make-sparse-keymap)))
-                    (define-key map ,(substring buffer-flip-keys 1 2)
-                      'buffer-flip-forward)
-                    (define-key map ,(substring buffer-flip-keys 2 3)
-                      'buffer-flip-backward)
-                    (define-key map (kbd "C-g") 'buffer-flip-abort)
-                    map
-                    ))))
-         (new-config-string (concat (mapconcat 'pp-to-string new-config "\n") "
-;; In addtion, remove the following.
-;; REMOVE: (buffer-flip-mode)
-;; REMOVE: (buffer-flip-set-keys ...)
-;; REMOVE: (custom-set-variables ... '(buffer-flip-keys ...))")))
-    (display-warning 'buffer-flip
-                     (format "Configuration requires upgrading.
-
-Buffer-flip has been updated and its old configuration is being
-phased out.  Change your configuration as follows for an updated
-configuration with your current key bindings.
-
-
-%s
-
-
-The above code has automatically been run so buffer-flip should
-continue to work with the same key bindings as before, but you
-will continue to see this message on startup until you update
-your configuration as shown above.
-
-Sorry for the inconvenience.  The main reason for the change is
-to add support for normal (non-chord) key bindings.  Backwards
-compatibility with old configuration will be removed in a future
-version.
-" new-config-string) :warning)
-    (put 'buffer-flip-keys 'variable-documentation (concat "
-         Deprecated.  This property should not be used to
-         configure your key bindings.  The following
-         configuration will give you the same key bindings.  It
-         is recommended that you update your configuration as
-         follows, and remove any configuration you have for this
-         variable.\n\n" new-config-string))
-    (mapc 'eval new-config))) ; run the new configuration
 
 (provide 'buffer-flip)
 ;;; buffer-flip.el ends here
