@@ -5,6 +5,7 @@
 ;; URL: https://github.com/killdash9/buffer-flip.el
 ;; Created: 10th November 2015
 ;; Version: 3.0
+;; Package-Requires: ((cl-lib "0.5"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -23,7 +24,7 @@
 ;; Inspired by Alt-Tab.  Quickly flip through recently-used buffers.
 
 ;;; Code:
-(eval-when-compile (require 'cl))
+(require 'cl-lib)
 
 (defvar buffer-flip-map '(keymap)
   "The transient map which is active during cycling.
@@ -102,11 +103,11 @@ If there is no other window, one is created first."
 DIRECTION can be 'forward or 'backward"
   (let ((l (buffer-list)))
     (switch-to-buffer            ; Switch to next/prev buffer in stack
-     (do ((buf (current-buffer)  ; Using the current buffer as a
-               (nth (mod (+ (cl-position buf l) ; reference point to cycle
-                            (if (eq direction 'backward) -1 1)) ; fwd or back
-                         (length l)) l)) ; Mod length to wrap
-          (count (length l) (1- count))) ; count the number of iterations
+     (cl-do ((buf (current-buffer)     ; Using the current buffer as a
+                  (nth (mod (+ (cl-position buf l) ; reference point to cycle
+                               (if (eq direction 'backward) -1 1)) ; fwd or back
+                            (length l)) l)) ; Mod length to wrap
+             (count (length l) (1- count))) ; count the number of iterations
          ((or (= 0 count) ;; don't cycle through list more than once.
               (not (buffer-flip-skip-buffer buf))) buf)) t))) ; skip some buffers
 
